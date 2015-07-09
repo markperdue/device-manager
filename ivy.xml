@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="righteousbanana" module="device-manager" status="integration"/>
+    
+	<configurations>
+		<conf name="compile"/>
+		<conf name="runtime" extends="compile"/>
+		<conf name="test" extends="runtime"/>
+	</configurations>
+    
+	<dependencies>
+		<dependency org="org.glassfish.jersey.core" name="jersey-server" rev="2.19" conf="compile->default"/>
+		<dependency org="org.glassfish.jersey.containers" name="jersey-container-servlet-core" rev="2.19" conf="runtime->default"/>
+		<dependency org="mysql" name="mysql-connector-java" rev="5.1.35" conf="runtime->default"/>
+		<dependency org="junit" name="junit" rev="4.11" conf="test->default"/>
+	</dependencies>
+</ivy-module>

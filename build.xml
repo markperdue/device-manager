@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE xml>
+<project name="device-manager" basedir="." default="main" xmlns:ivy="antlib:org.apache.ivy.ant">
+	<property name="src.dir" 			location="src/main/java"/>
+	<property name="resources.dir" 		location="src/main/resources"/>
+	<property name="test.dir" 			location="src/test/java"/>
+	<property name="ivy.jar.dir" 		location="ivy"/>
+	<property name="build.dir" 			location="build"/>
+	<property name="classes.dir" 		location="${build.dir}/classes"/>
+	<property name="classes.test.dir"	location="${build.dir}/test-classes"/>
+	<property name="test.report.dir" 	location="${build.dir}/test-reports"/>
+	<property name="ivy.reports.dir" 	location="${build.dir}/ivy-reports"/>
+	<property name="lib.dir" 			location="${build.dir}/lib"/>
+	<property name="dist.dir" 			location="${build.dir}/dist"/>
+	<property name="dist.resources.dir" location="${dist.dir}/resources"/>
+	<property name="war.file" value="${dist.dir}/device-manager.war"/>
+	
+	<tstamp>
+		<format property="TIME" pattern="hh:mm:ssa z" locale="en"/>
+	</tstamp>
+	
+	<!-- Ivy lib path and taskdef -->
+	<path id="ivy.lib.path">
+		<fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+	</path>
+	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+
+	<!-- Start work -->
+	<target name="main" depends="clean,build">
+		<antcall target="deploy-configs"/>
+	</target>
+	
+	<!-- Delete existing dist and build directories -->
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+	
+	<target name="ivy-resolve">
+		<ivy:resolve/>
+		<ivy:report todir="${ivy.reports.dir}" graph="false" xml="false"/>
+		<ivy:cachepath pathid="compile.path" conf="compile"/>
+		<ivy:cachepath pathid="runtime.path" conf="runtime"/>
+		<ivy:cachepath pathid="test.path" conf="test"/>
+	</target>
+	
+	<target name="compile" depends="ivy-resolve">
+		<mkdir dir="${classes.dir}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="compile.path" includeantruntime="false"/>
+	</target>
+	
+	<target name="compile-tests" depends="compile">
+		<mkdir dir="${classes.test.dir}"/>
+		<javac srcdir="${test.dir}" destdir="${classes.test.dir}" includeantruntime="false">
+			<classpath>
+				<path refid="test.path"/>
+				<pathelement path ="${classes.dir}"/>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="test" depends="compile-tests">
+		<mkdir dir="${test.report.dir}"/>
+		<junit printsummary="yes" fork="yes" haltonfailure="no">
+			<classpath>
+		   	    <path refid="test.path"/>
+				<pathelement path="${classes.dir}"/>
+				<pathelement path="${classes.test.dir}"/>
+		    </classpath>
+			<formatter type="xml"/>
+			<batchtest todir="${test.report.dir}">
+				<fileset dir="${test.dir}" includes="**/*Test.java"/>
+			</batchtest>
+		</junit>
+	</target>
+	
+	<target name="set_version">
+		<condition property="build.version.value" value="${build.version}" else="local build">
+			<isset property="build.version"/>
+		</condition>
+		
+		<echo message="Build version set to '${build.version.value}'"/>
+	</target>
+
+	<target name="build" depends="test,set_version">
+		<ivy:retrieve pattern="${lib.dir}/[artifact]-[revision](-[classifier]).[ext]" conf="runtime"/>
+		
+		<war destfile="${war.file}" webxml="${resources.dir}/web.xml">
+		   	<lib dir="${lib.dir}"/>
+			<classes dir="${classes.dir}"/>
+			<manifest>
+				<attribute name="Author" value="Mark Perdue"/>
+				<attribute name="Built-On" value="${TODAY} ${TIME}"/>
+				<attribute name="Version" value="${build.version.value}"/>
+				<attribute name="License" value="The MIT License (MIT)"/>
+			</manifest>
+		</war>
+	</target>
+
+	<target name="deploy-configs">
+		<mkdir dir="${dist.resources.dir}"/>
+		<copy todir="${dist.resources.dir}">
+			<fileset dir="${resources.dir}">
+				<exclude name="web.xml"/>
+			</fileset>
+		</copy>
+	</target>
+</project>
