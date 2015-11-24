@@ -21,33 +21,16 @@ public class RestService {
 	
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
-	public String empty() {
-		System.out.println("Here we go!!");
-		Properties properties = ReadPropertyFile.getProperties();
-		
-		System.out.println(properties.getProperty("db_host"));
-		System.out.println(properties.getProperty("db_port"));
-		System.out.println(properties.getProperty("db_name"));
-	    return "Done";
+	public Response empty() {
+	    return Response.status(200).entity("OK").build();
 	}
 	
-	@Path("/v1/device/{device_id}/checkin2")
-	@POST
-	@Consumes(MediaType.APPLICATION_XML)
-	public Response postCheckIn2(@PathParam("device_id") String device_id, @Context HttpHeaders headers, String xml) {
-        MySQLAccess access = new MySQLAccess();
-		ReturnStatus status = access.dbPostCheckinForID(device_id, headers, xml);
-        
-        return Response.status(status.getCode()).entity(status.getMessage()).build();
-	}
-
 	@Path("/v1/devices")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getDevicesMatch(@DefaultValue("") @QueryParam("query") String query, @DefaultValue("") @QueryParam("available") String available, @DefaultValue("") @QueryParam("dev") String devProvisioned, @DefaultValue("") @QueryParam("checked_out_to") String checkedOutTo) {
 		Map<String, String> map = returnQueryAsMap(query, available, devProvisioned, checkedOutTo);
-        MySQLAccess access = new MySQLAccess();
-        ReturnStatus status = access.dbGetDevices(map);
+		ReturnStatus status = getDevices(map);
         
         // Build a GenericEntity per http://stackoverflow.com/questions/6081546/jersey-can-produce-listt-but-cannot-response-oklistt-build
         GenericEntity<List<Device>> entity = new GenericEntity<List<Device>>(status.getDeviceList()) {};
@@ -67,6 +50,15 @@ public class RestService {
         return Response.status(status.getCode()).entity(status.getMessage()).build();
 	}
 
+	@Path("/v1/device/{device_id}")
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	public Response getDevice(@PathParam("device_id") String device_id) {
+		ReturnStatus status = getDeviceOfID(device_id);
+        
+        return Response.status(status.getCode()).entity(status.getDevice()).build();
+	}
+
 	// Update an existing device
 	// Requires an Authorization header that includes "<username>:<hashed pw>"
 	@Path("/v1/device/{device_id}")
@@ -78,20 +70,14 @@ public class RestService {
 
         return Response.status(status.getCode()).entity(status.getMessage()).build();
 	}
-
-	@Path("/v1/device/{device_id}")
+	
+	@Path("/v1/device/{device_id}/available")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
-	public Device getDevice(@PathParam("device_id") String device_id) {
-		Device device = null;
-        MySQLAccess access = new MySQLAccess();
-        try {
-			device = access.dbFetchDeviceOfID(device_id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public Response getDeviceAvailability(@PathParam("device_id") String device_id) {
+        ReturnStatus status = getDeviceOfIDAvailability(device_id);
         
-        return device;
+        return Response.status(status.getCode()).entity(status.getDevice()).build();
 	}
 
 	// Check in a device
@@ -99,12 +85,6 @@ public class RestService {
 	@Path("/v1/device/{device_id}/checkin")
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
-//	public Response postCheckIn(@PathParam("device_id") String device_id, @Context HttpHeaders headers) {
-//        MySQLAccess access = new MySQLAccess();
-//		ReturnStatus status = access.dbPostCheckinForID(device_id, headers);
-//        
-//        return Response.status(status.getCode()).entity(status.getMessage()).build();
-//	}
 	public Response postCheckIn(@PathParam("device_id") String device_id, @Context HttpHeaders headers, String xml) {
         MySQLAccess access = new MySQLAccess();
 		ReturnStatus status = access.dbPostCheckinForID(device_id, headers, xml);
@@ -122,21 +102,6 @@ public class RestService {
 		ReturnStatus status = access.dbPostCheckoutForID(device_id, headers);
         
         return Response.status(status.getCode()).entity(status.getMessage()).build();
-	}
-
-	@Path("/v1/device/{device_id}/available")
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public boolean getDeviceAvailability(@PathParam("device_id") String device_id) {
-        MySQLAccess access = new MySQLAccess();
-        boolean status = false;
-        try {
-			status = access.dbGetDeviceAvailability(device_id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-        
-        return status;
 	}
 
 	private Map<String, String> returnQueryAsMap(String query, String available, String devProvisioned, String checkedOutTo) {
@@ -164,4 +129,83 @@ public class RestService {
 		
 		return map;
 	}
+	
+	public ReturnStatus getDeviceOfID(String did) {
+		String message;
+		int code;
+		Device device;
+		
+		MySQLAccess access = new MySQLAccess();
+		Device fetchedDevice = access.dbFetchDeviceOfID(did);
+		
+		if (fetchedDevice.isValidDevice()) {
+			device = fetchedDevice;
+			message = "OK";
+			code = 200;
+		}
+		else {
+			// Add empty device
+			device = new Device();
+			message = "No device";
+			code = 404;
+		}
+
+		return new ReturnStatus(message, code, device);
+	}
+	
+	public ReturnStatus getDeviceOfIDAvailability(String did) {
+		String message;
+		int code;
+		Device device;
+		
+		MySQLAccess access = new MySQLAccess();
+		Device fetchedDevice = access.dbGetDeviceAvailability(did);
+		
+		if (fetchedDevice.isAvailable() != null) {
+			device = fetchedDevice;
+			message = "OK";
+			code = 200;
+		}
+		else {
+			// Add empty device
+			device = new Device();
+			message = "No device";
+			code = 404;
+		}
+
+		return new ReturnStatus(message, code, device);
+	}
+	
+	public ReturnStatus getDevices(Map<String, String> map) {
+		String message;
+		int code;
+		List<Device> devices;
+		
+		MySQLAccess access = new MySQLAccess();
+		devices = access.dbGetDevices(map);
+		
+		if (devices != null) {
+			message = "OK";
+			code = 200;
+		}
+		else {
+			devices = new ArrayList<Device>();
+			message = "No devices";
+			code = 404;
+		}
+
+		return new ReturnStatus(message, code, devices);
+	}
+
+//	// Check in a device (OLD)
+//	// Requires an Authorization header that includes "<username>:<hashed pw>"
+//	@Path("/v1/device/{device_id}/checkin")
+//	@POST
+//	@Consumes(MediaType.APPLICATION_XML)
+//	public Response postCheckIn(@PathParam("device_id") String device_id, @Context HttpHeaders headers) {
+//		MySQLAccess access = new MySQLAccess();
+//		ReturnStatus status = access.dbPostCheckinForID(device_id, headers);
+//  
+//		return Response.status(status.getCode()).entity(status.getMessage()).build();
+//	}
 }

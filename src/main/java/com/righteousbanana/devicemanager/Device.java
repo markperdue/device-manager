@@ -8,15 +8,15 @@ import java.util.List;
 public class Device {
 	
 	private String deviceID;
-	private boolean available;
+	private Boolean available;
 	private String type;
 	private String manufacturer;
 	private String model;
 	private String modelVersion;
 	private String osType;
 	private String osVersion;
-	private boolean devProvisioned;
-	private boolean jailbroken;
+	private Boolean devProvisioned;
+	private Boolean jailbroken;
 	private String location;
 	private String managerDept;
 	private String managerName;
@@ -26,20 +26,19 @@ public class Device {
 	private String note;
 	private String carrier;
 	private String phoneNumber;
-	private boolean recoveryModeEnabled;
-	private int checkedOutCount;
+	private Boolean recoveryModeEnabled;
+	private Integer checkedOutCount;
 	private String imagePath;
 	private Date createdOn;
 	private Date changedOn;
 	private List<Activity> recentActivity;
 	
 	public Device() {
-		
 	}
 	
-	public Device(String deviceID, boolean available, String type, String manufacturer, String model, String modelVersion, String osType, String osVersion, 
-			boolean devProvisioned, boolean jailbroken, String location, String managerDept, String managerName, String checkedOutTo, Date checkedOutDate, String udid, String note, String carrier, 
-			String phoneNumber, boolean recoveryModeEnabled, int checkedOutCount, String imagePath, Date createdOn, Date changedOn) {
+	public Device(String deviceID, Boolean available, String type, String manufacturer, String model, String modelVersion, String osType, String osVersion, 
+			Boolean devProvisioned, Boolean jailbroken, String location, String managerDept, String managerName, String checkedOutTo, Date checkedOutDate, String udid, String note, String carrier, 
+			String phoneNumber, Boolean recoveryModeEnabled, Integer checkedOutCount, String imagePath, Date createdOn, Date changedOn) {
 		this.deviceID = deviceID;
 		this.available = available;
 		this.type = type;
@@ -68,9 +67,9 @@ public class Device {
 		this.display();
 	}
 	
-	public Device(String deviceID, boolean available, String type, String manufacturer, String model, String modelVersion, String osType, String osVersion, 
-			boolean devProvisioned, boolean jailbroken, String location, String managerDept, String managerName, String checkedOutTo, Date checkedOutDate, String udid, String note, String carrier, 
-			String phoneNumber, boolean recoveryModeEnabled, int checkedOutCount, String imagePath, Date createdOn, Date changedOn, List<Activity> recentActivity) {
+	public Device(String deviceID, Boolean available, String type, String manufacturer, String model, String modelVersion, String osType, String osVersion, 
+			Boolean devProvisioned, Boolean jailbroken, String location, String managerDept, String managerName, String checkedOutTo, Date checkedOutDate, String udid, String note, String carrier, 
+			String phoneNumber, Boolean recoveryModeEnabled, Integer checkedOutCount, String imagePath, Date createdOn, Date changedOn, List<Activity> recentActivity) {
 		this.deviceID = deviceID;
 		this.available = available;
 		this.type = type;
@@ -99,6 +98,38 @@ public class Device {
 		
 		this.display();
 	}
+	
+//	public Device(String deviceID, boolean available, String type, String manufacturer, String model, String modelVersion, String osType, String osVersion, 
+//			boolean devProvisioned, boolean jailbroken, String location, String managerDept, String managerName, String checkedOutTo, Date checkedOutDate, String udid, String note, String carrier, 
+//			String phoneNumber, boolean recoveryModeEnabled, int checkedOutCount, String imagePath, Date createdOn, Date changedOn, List<Activity> recentActivity) {
+//		this.deviceID = deviceID;
+//		this.available = available;
+//		this.type = type;
+//		this.manufacturer = manufacturer;
+//		this.model = model;
+//		this.modelVersion = modelVersion;
+//		this.osType = osType;
+//		this.osVersion = osVersion;
+//		this.devProvisioned = devProvisioned;
+//		this.jailbroken = jailbroken;
+//		this.location = location;
+//		this.managerDept = managerDept;
+//		this.managerName = managerName;
+//		this.checkedOutTo = checkedOutTo;
+//		this.checkedOutDate = checkedOutDate;
+//		this.udid = udid;
+//		this.note = note;
+//		this.carrier = carrier;
+//		this.phoneNumber = phoneNumber;
+//		this.recoveryModeEnabled = recoveryModeEnabled;
+//		this.checkedOutCount = checkedOutCount;
+//		this.imagePath = imagePath;
+//		this.createdOn = createdOn;
+//		this.changedOn = changedOn;
+//		this.recentActivity = recentActivity;
+//		
+//		this.display();
+//	}
 	
 //	public void buildFromDBEntry(String deviceID, boolean available, String type, String manufacturer, String model, String modelVersion, String osType, String osVersion, 
 //			boolean devProvisioned, boolean jailbroken, String location, String managerDept, String managerName, String checkedOutTo, Date checkedOutDate, String udid, String note, String carrier, 
@@ -166,11 +197,11 @@ public class Device {
 		this.deviceID = deviceID;
 	}
 
-	public boolean isAvailable() {
+	public Boolean isAvailable() {
 		return available;
 	}
 
-	public void setAvailable(boolean available) {
+	public void setAvailable(Boolean available) {
 		this.available = available;
 	}
 
@@ -227,19 +258,19 @@ public class Device {
 	}
 
 	@XmlElement(name = "dev_provisioned")
-	public boolean isDevProvisioned() {
+	public Boolean isDevProvisioned() {
 		return devProvisioned;
 	}
 
-	public void setDevProvisioned(boolean devProvisioned) {
+	public void setDevProvisioned(Boolean devProvisioned) {
 		this.devProvisioned = devProvisioned;
 	}
 
-	public boolean isJailbroken() {
+	public Boolean isJailbroken() {
 		return jailbroken;
 	}
 
-	public void setJailbroken(boolean jailbroken) {
+	public void setJailbroken(Boolean jailbroken) {
 		this.jailbroken = jailbroken;
 	}
 
@@ -281,16 +312,16 @@ public class Device {
 	}
 
 	@XmlElement(name = "recovery_mode_enabled")
-	public boolean isRecoveryModeEnabled() {
+	public Boolean isRecoveryModeEnabled() {
 		return recoveryModeEnabled;
 	}
 
-	public void setRecoveryModeEnabled(boolean recoveryModeEnabled) {
+	public void setRecoveryModeEnabled(Boolean recoveryModeEnabled) {
 		this.recoveryModeEnabled = recoveryModeEnabled;
 	}
 
 	@XmlElement(name = "checked_out_count")
-	public int getCheckedOutCount() {
+	public Integer getCheckedOutCount() {
 		return checkedOutCount;
 	}
 

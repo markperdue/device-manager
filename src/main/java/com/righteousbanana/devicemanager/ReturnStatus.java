@@ -6,6 +6,7 @@ public class ReturnStatus {
 	
 	private final String message;
 	private final int code;
+	private Device device;
 	private List<Device> deviceList;
 	
 	public ReturnStatus(String message, int code) {
@@ -19,7 +20,14 @@ public class ReturnStatus {
 		this.deviceList = deviceList;
 	}
 	
+	public ReturnStatus(String message, int code, Device device) {
+		this.message = message;
+		this.code = code;
+		this.device = device;
+	}
+	
 	public String getMessage() { return message; }
 	public int getCode() { return code; }
 	public List<Device> getDeviceList() { return deviceList; }
+	public Device getDevice() { return device; }
 }
