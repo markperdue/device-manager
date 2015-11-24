@@ -1,4 +1,4 @@
-### DeviceManager
+### device-manager
 
 
 A java webapp that provides the backend to `device-genie`
