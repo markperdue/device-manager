@@ -23,6 +23,13 @@ A java webapp that provides the backend to `device-genie`
 
 
 
+## Validation
+
+
+1. Perform a GET to http://<tomcat host>/device-manager/rest/ (something like http://localhost:8080/device-manager/rest/) and the webapp should respond with a 200 OK 
+
+
+
 ## License
 
 device-manager is released under the [MIT License](http://www.opensource.org/licenses/MIT).
