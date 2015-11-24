@@ -25,4 +25,4 @@ A java webapp that provides the backend to `device-genie`
 
 ## License
 
-DeviceManager is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+device-manager is released under the [MIT License](http://www.opensource.org/licenses/MIT).
